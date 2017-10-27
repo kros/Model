@@ -1,0 +1,20 @@
+{
+   "name": "kros/model",
+   "description" : "Work with model classes without having to create them.",
+	"homepage" : "https://github.com/kros/Model",
+	"license" : "GNU Version 2",
+	"authors" : [{
+			"name" : "Oscar Ruiz",
+			"email" : "ormartin@gmail.com",
+			"homepage" : "https://github.com/kros",
+			"role" : "Developer"
+		}
+	],
+	"autoload": {
+	   "psr-4": {"Kros\\Model\\": "src/"}
+	},
+	"keywords" : [
+		"model",
+		"active record"
+	]   
+}
