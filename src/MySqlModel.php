@@ -1,7 +1,7 @@
 <?php
 namespace Kros\Model;
 require_once "Model.php";
-class MySqlModel extends Model{
+class MySqlModel extends AbstractModel{
 	
    /**
    * 
