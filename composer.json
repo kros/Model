@@ -2,7 +2,7 @@
    "name": "kros/model",
    "description" : "Work with model classes without having to create them.",
 	"homepage" : "https://github.com/kros/Model",
-	"license" : "GNU Version 2",
+	"license" : "GPL-2.0-or-later",
 	"authors" : [{
 			"name" : "Oscar Ruiz",
 			"email" : "ormartin@gmail.com",
