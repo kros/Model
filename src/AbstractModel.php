@@ -394,7 +394,7 @@ class Record{
 		$sqlBase = str_replace('#values#', '', $sqlBase);
 		$sqlBase = str_replace('#,fields-values#', '', $sqlBase);
 		$sqlBase = str_replace('#fields-values#', '', $sqlBase);
-		$sqlBase = str_replace('#primaryKey#', implode(' and ', $keys), $sqlBase);var_dump($sqlBase);
+		$sqlBase = str_replace('#primaryKey#', implode(' and ', $keys), $sqlBase);
 		$newId = $this->model->execute($sqlBase);
 		if ($nuevo){
 			$this->asignarIdAutoIncremental($newId);
