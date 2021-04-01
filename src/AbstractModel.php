@@ -89,7 +89,7 @@ class Table{
 		}		
 		$res=$this->model->getForeigns($tableName);
 		foreach ($res as $linea){
-			$this->FKeys[$linea['columnName']]= new FKey($linea['fTable'], $linea['fColumn']);
+			$this->FKeys[$linea['columnName']]= new FKey($linea['fTable'], $linea['fColumn'], $this->model);
 		}		
 	}
 	public function getPKeys(){
@@ -142,11 +142,11 @@ class Table{
 			throw new \Exception("Registro no localizado");
 		}
 	}
-	/*** 	Busca todos los registros que cumplan una condición
-		$condition = string con la condición de búsqueda
+	/*** 	Busca todos los registros que cumplan una condici�n
+		$condition = string con la condici�n de b�squeda
 		$order = array de nombres de campo y valores 'asc' o 'desc'
-		$start = número de registros donde se empieza
-		$len = número de registros que se devuelven, si es 0, se devuelven todos
+		$start = n�mero de registros donde se empieza
+		$len = n�mero de registros que se devuelven, si es 0, se devuelven todos
 		Devuelve un array de objetos MySqlRow.
 	*/
 	public function select($condition='', $order=array(), $start=0, $len=0){
@@ -275,6 +275,7 @@ class Column{
 class FKey{
 	private $tableName;
 	private $columnName;
+	private $model;
 	public function getTableName(){
 		return $this->tableName;
 	}
@@ -288,14 +289,15 @@ class FKey{
 		$this->columnName=$value;
 	}
 	public function getTable(){
-		return MySqlTable::getTable($this->tableName);
+		return $this->model->getTable($this->tableName);
 	}
 	public function getColumn(){
 		return $this->getTable()->getColumn($this->columnName);
 	}
-	public function __construct($tableName, $columnName){
+	public function __construct($tableName, $columnName, $model){
 		$this->tableName=$tableName;
 		$this->columnName=$columnName;
+		$this->model=$model;
 	}
 }
 class Record{
@@ -303,7 +305,6 @@ class Record{
 	private $fields = array();
 	private $key = array();
 	private $model;
-	private $new;
 	public function getTable(){
 		return $this->table;
 	}
@@ -313,13 +314,6 @@ class Record{
 		foreach($this->table->getPkeys() as $columnName){
 			$this->key[$columnName]=new NotSet();//nuevo. antes NULL
 		}
-		$this->new=TRUE;
-	}
-	public function getNew(){
-		return $this->new;
-	}
-	public function setNew($value){
-		$this->new=$value;
 	}
 	public function load($dataRow){
 		 foreach($dataRow as $id=>$value){
@@ -328,7 +322,6 @@ class Record{
 		foreach($this->key as $id=>$value){
 			$this->key[$id] = $dataRow[$id];
 		}
-		$this->new=FALSE;
 	}
 	public function __get($name){
 		return $this->getField($name);
@@ -366,8 +359,7 @@ class Record{
 		return array_keys($this->getTable()->getColumns());
 	}
 	public function save(){
-		//$nuevo=$this->esNuevo();
-		$nuevo = $this->new;
+		$nuevo=$this->esNuevo();
 		if (!($nuevo || $this->tieneClave())){
 			throw new \Exception ("No se puede guardar. No tiene clave");
 		}
@@ -476,14 +468,16 @@ class Record{
 			}
 			$resCondition[$fk->getColumnName()]=$this->getField($columnName);
 		}
-		$t=new MySqlTable($masterTable, $this->getTable()->getModel());
+		//$t=new MySqlTable($masterTable, $this->getTable()->getModel());
+		$t=$this->model->getTable($masterTable);
 		return $t->seek($resCondition);
 	}
 	public function getDetalle($tableName, $condition='', $order=array(), $start=0, $len=0){
 		if (!$this->tieneClave()){
 			throw new \Exception ("No se puede obtener el detalle. No tiene clave primaria");
 		}
-		$t=new MySqlTable($masterTable, $this->getTable()->getModel());
+		//$t=new MySqlTable($masterTable, $this->getTable()->getModel());
+		$t=$this->model->getTable($tableName);
 		$res=array();
 		foreach($this->getTable()->getPKeys() as $columnName){
 			$tiene=FALSE;
@@ -558,7 +552,8 @@ class Recordset{
 				throw new \Exception ('Filtro no evalua a un valor Booleano');
 			}
 		}
-		return new MySqlRecordset($res);
+		//return new MySqlRecordset($res);
+		return $this->model->newRecordset($res);
 	}
 	/***
 	Evalua un array a cada una de las filas del recordset
@@ -585,4 +580,5 @@ class Recordset{
 		}
 	}
 }
+
 ?>
