@@ -142,11 +142,12 @@ class Table{
 			throw new \Exception("Registro no localizado");
 		}
 	}
-	/*** 	Busca todos los registros que cumplan una condici�n
-		$condition = string con la condici�n de b�squeda
+	/*** 	
+		Busca todos los registros que cumplan una condición
+		$condition = string con la condición de búsqueda
 		$order = array de nombres de campo y valores 'asc' o 'desc'
-		$start = n�mero de registros donde se empieza
-		$len = n�mero de registros que se devuelven, si es 0, se devuelven todos
+		$start = número de registros donde se empieza
+		$len = número de registros que se devuelven, si es 0, se devuelven todos
 		Devuelve un array de objetos MySqlRow.
 	*/
 	public function select($condition='', $order=array(), $start=0, $len=0){
@@ -305,24 +306,33 @@ class Record{
 	private $fields = array();
 	private $key = array();
 	private $model;
-	public function getTable(){
-		return $this->table;
-	}
+	private $new;
 	public function __construct($tableName, $model){
 		$this->model=$model;
 		$this->table=$this->model->getTable($tableName);
 		foreach($this->table->getPkeys() as $columnName){
 			$this->key[$columnName]=new NotSet();//nuevo. antes NULL
 		}
+		$this->new=TRUE;
 	}
 	public function load($dataRow){
-		 foreach($dataRow as $id=>$value){
-			 $this->setField($id, $value);
-		 }
+		foreach($dataRow as $id=>$value){
+			$this->setField($id, $value);
+		}
 		foreach($this->key as $id=>$value){
 			$this->key[$id] = $dataRow[$id];
 		}
+		$this->new=FALSE;
 	}
+	public function getTable(){
+		return $this->table;
+	}
+	public function getNew(){
+		return $this->new;
+	}
+	public function setNew($value){
+		$this->new=$value;
+	}	
 	public function __get($name){
 		return $this->getField($name);
 
@@ -359,7 +369,8 @@ class Record{
 		return array_keys($this->getTable()->getColumns());
 	}
 	public function save(){
-		$nuevo=$this->esNuevo();
+		//$nuevo=$this->esNuevo();
+		$nuevo=$this->new;
 		if (!($nuevo || $this->tieneClave())){
 			throw new \Exception ("No se puede guardar. No tiene clave");
 		}
@@ -393,7 +404,8 @@ class Record{
 		}
 	}
 	public function delete(){
-		if ($this->esNuevo()){
+		//if ($this->esNuevo()){
+		if ($this->new){
 			throw new \Exception ("No se puede eliminar. Registro nuevo");
 		}else{
 			if (!$this->tieneClave()){
