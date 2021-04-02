@@ -28,15 +28,27 @@ class DbException extends \Exception
         $this->driverMessage=$errorInfo[2];
         $this->sql=$sql;
     }
+    /***
+     * Devuelve el código standard ANSI SQL del error
+     */
     public function getSqlstate(){
         return $this->sqlstate;
     }
+    /***
+     * Devuelve el código de error específico del driver
+     */
     public function getDriverError(){
         return $this->driverError;
     }
+    /***
+     * Devuelve el mensaje de error específico del driver
+     */
     public function getErrorMessage(){
         return $this->driverMessage;
     }
+    /***
+     * Devuelve la sentencia sql que provocó el error
+     */
     public function getSql(){
         return $this->sql;
     }
