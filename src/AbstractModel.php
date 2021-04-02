@@ -1,5 +1,10 @@
 <?php
 namespace Kros\Model;
+
+require_once 'DbException.php';
+
+use Kros\Model\DbException;
+
 abstract class AbstractModel{
    private $tables = null;	
    private $connectionString=null;
@@ -39,6 +44,9 @@ abstract class AbstractModel{
 
    function execute($sql){
       $count = $this->getCN()->exec($sql);
+	  if ($count===false){
+		throw new DbException($this->getCN()->errorInfo(), $sql);
+	  }
       return $count;
    }
    function getLastInsertedId(){
@@ -360,8 +368,7 @@ class Record{
 	}
 	public function setField($name, $value){
 		if (array_key_exists($name, $this->getTable()->getColumns())){
-	        	//$this->fields[$name]['value']=$value;
-	        	$this->fields[$name]=$value;
+				$this->fields[$name]=$value;
 		}else
 			throw new \Exception("No existe propiedad '$name' para la tabla '".$this->getTable()->getTableName()."'");		
 	}
