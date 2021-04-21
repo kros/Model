@@ -113,10 +113,10 @@ class Table{
 			throw new \Exception("No existe campo '$columnName' para la tabla '".$this->getTableName()."'");
 	}
 	/*** 	
-	    Busca la primera aparición
-		$condition = array de pares nombres de campo y valor
-		$order = array de nombres de campo y valores 'asc' o 'desc'
-		Devuelve un objeto MySqlRow.
+	    Busca la primera aparición.
+		@param array $condition Array de pares nombres de campo y valor.
+		@param array $order Array de nombres de campo y valores 'asc' o 'desc'.
+		@return MySqlRow
 	*/
 	public function seek($condition = array(), $order=array()){
 		$where = array();
@@ -151,17 +151,17 @@ class Table{
 		}
 	}
 	/*** 	
-		Busca todos los registros que cumplan una condición
-		$condition = string con la condición de búsqueda
-		$order = array de nombres de campo y valores 'asc' o 'desc'
-		$start = número de registros donde se empieza
-		$len = número de registros que se devuelven, si es 0, se devuelven todos
-		Devuelve un array de objetos MySqlRow.
+		Busca todos los registros que cumplan una condición.
+		@param string $condition [optional] Condición de búsqueda.
+		@param array $order [optional] Array de nombres de campo y valores 'asc' o 'desc'.
+		@param integer $start [optional] Número de registros donde se empieza.
+		@param integer $len [optional] Número de registros que se devuelven, si es 0, se devuelven todos.
+		@return Recordset
 	*/
 	public function select($condition='', $order=array(), $start=0, $len=0){
 		$orderBy = array();
 		foreach ($order as $key=>$value){
-			$orderBy[] = sprintf("`%s` %s", $key, $value);
+			$orderBy[] = sprintf("%s %s", $key, $value);
 		}
 		if (strLen($condition)>0){
 			$sWhere = " WHERE ".$condition;
@@ -529,10 +529,18 @@ class Record{
 		return eval('return '.$s.';');
 	}
 }
+/**
+ * Clase que modela un conjunto de registros pertenecientes a la misma tabla.
+ */
 class Recordset{
 	private $sql = "";	
 	private $rows = array();
 	private $model = null;
+	/**
+	 * Constructor de la clase.
+	 * @param array|string $aRows String con la consulta sql que genera el conjunto de resultados o un array de objetos Record
+	 * @param AbstractModel @model Modelo al que pertenece el Recordset.
+	 */
 	public function __construct($aRows, $model){
 		$this->model=$model;
 		if (is_array($aRows)){
