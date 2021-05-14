@@ -262,7 +262,7 @@ class Column{
 				$value = (double)$value;
 				break;
 			case "text":
-				$value = utf8_encode($value);
+				$value = $value;
 				break;
 			case "date":
 				if (is_string($value)){
@@ -278,7 +278,7 @@ class Column{
 		return $value;
 	}
 	public function sqlVal($value){
-		return utf8_decode($this->model->GetSQLValueString($value, $this->getSimpleType()));
+		return $this->model->GetSQLValueString($value, $this->getSimpleType());
 	}
 }
 class FKey{
