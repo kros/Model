@@ -405,9 +405,9 @@ class Record{
 		$sqlBase = str_replace('#,fields-values#', '', $sqlBase);
 		$sqlBase = str_replace('#fields-values#', '', $sqlBase);
 		$sqlBase = str_replace('#primaryKey#', implode(' and ', $keys), $sqlBase);
-		$newId = $this->model->execute($sqlBase);
+		$this->model->execute($sqlBase);
 		if ($nuevo){
-			$this->asignarIdAutoIncremental($newId);
+			$this->asignarIdAutoIncremental($this->model->getLastInsertedId());
 		}
 	}
 	public function delete(){
