@@ -409,6 +409,7 @@ class Record{
 		if ($nuevo){
 			$this->asignarIdAutoIncremental($this->model->getLastInsertedId());
 			$this->new = FALSE;
+			$this->load($this->fields);
 		}
 	}
 	public function delete(){
