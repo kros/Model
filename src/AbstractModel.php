@@ -19,6 +19,10 @@ abstract class AbstractModel{
 	  $this->tables=array();
    }
 
+   public function getFields(){
+      return $this->fields;
+   }
+	
    public function getCN(){
       if ($this->cn==null){
          $this->cn = new \PDO($this->connectionString, $this->user, $this->password);
