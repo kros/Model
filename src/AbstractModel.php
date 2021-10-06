@@ -11,6 +11,7 @@ abstract class AbstractModel{
    private $cn=null;
    private $user=null;
    private $password=null;
+   private $transactionDepth=0;
 
    function __construct($connectionString, $user=null, $password=null){
       $this->connectionString=$connectionString;
@@ -24,6 +25,40 @@ abstract class AbstractModel{
          $this->cn = new \PDO($this->connectionString, $this->user, $this->password);
       }
       return $this->cn;
+   }
+	
+   public function beginTransaction(){
+      if($this->transactionDepth == 0 || !$this->hasSavepoint()) {
+         $this->getCN()->beginTransaction();
+      } else {
+         $this->getCN()->exec("SAVEPOINT LEVEL{$this->transactionDepth}");
+      }
+
+      $this->transactionDepth++;		
+   }
+
+   public function commit(){
+      $this->transactionDepth--;
+
+      if($this->transactionDepth == 0 || !$this->hasSavepoint()) {
+         $this->getCN()->commit();
+      } else {
+         $this->getCN()->exec("RELEASE SAVEPOINT LEVEL{$this->transactionDepth}");
+      }
+   }
+
+   public function rollback(){
+      if ($this->transactionDepth == 0) {
+         throw new \PDOException('Rollback error : There is no transaction started');
+      }
+
+      $this->transactionDepth--;
+
+      if($this->transactionDepth == 0 || !$this->hasSavepoint()) {
+		$this->getCN()->rollBack();
+      } else {
+		$this->getCN()->exec("ROLLBACK TO SAVEPOINT LEVEL{$this->transactionDepth}");
+      }
    }
 
    public function getTable($tableName){
@@ -63,6 +98,7 @@ abstract class AbstractModel{
    abstract public function getForeigns($tableName);
    abstract public function getSimpleType($dbType);
    abstract public function GetSQLValueString($theValue, $theType, $theDefinedValue, $theNotDefinedValue);
+   abstract public function hasSavepoint();
 }
 class NotSet{}
 
